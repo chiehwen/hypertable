@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -31,10 +31,13 @@
 #include "OperationProcessor.h"
 #include "OperationStop.h"
 
+#define OPERATION_STOP_VERSION 1
+
 using namespace Hypertable;
 
 OperationStop::OperationStop(ContextPtr &context, EventPtr &event) 
-  : Operation(context, event, MetaLog::EntityType::OPERATION_STOP) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_STOP,
+              OPERATION_STOP_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

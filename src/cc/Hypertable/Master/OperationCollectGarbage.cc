@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -25,10 +25,13 @@
 #include "OperationCollectGarbage.h"
 #include "GcWorker.h"
 
+#define OPERATION_COLLECT_GARBAGE_VERSION 1
+
 using namespace Hypertable;
 
 OperationCollectGarbage::OperationCollectGarbage(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_COLLECT_GARBAGE) {
+  : Operation(context, MetaLog::EntityType::OPERATION_COLLECT_GARBAGE,
+              OPERATION_COLLECT_GARBAGE_VERSION) {
   m_dependencies.insert(Dependency::INIT);
   m_dependencies.insert(Dependency::METADATA);
 }

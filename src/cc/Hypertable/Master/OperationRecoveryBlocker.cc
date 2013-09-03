@@ -26,10 +26,13 @@
 #include "OperationRecoveryBlocker.h"
 #include "OperationTimedBarrier.h"
 
+#define OPERATION_RECOVERY_BLOCKER_VERSION 1
+
 using namespace Hypertable;
 
 OperationRecoveryBlocker::OperationRecoveryBlocker(ContextPtr &context)
-    : Operation(context, MetaLog::EntityType::OPERATION_RECOVERY_BLOCKER) {
+  : Operation(context, MetaLog::EntityType::OPERATION_RECOVERY_BLOCKER,
+              OPERATION_RECOVERY_BLOCKER_VERSION) {
   m_obstructions.insert(Dependency::RECOVERY_BLOCKER);
 }
 

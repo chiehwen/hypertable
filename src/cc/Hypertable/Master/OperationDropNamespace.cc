@@ -29,22 +29,28 @@
 
 #include "OperationDropNamespace.h"
 
+#define OPERATION_DROP_NAMESPACE_VERSION 1
+
 using namespace Hypertable;
 
-
-OperationDropNamespace::OperationDropNamespace(ContextPtr &context, const String &name, bool if_exists)
-  : Operation(context, MetaLog::EntityType::OPERATION_DROP_NAMESPACE), m_name(name) {
+OperationDropNamespace::OperationDropNamespace(ContextPtr &context,
+                                               const String &name,
+                                               bool if_exists)
+  : Operation(context, MetaLog::EntityType::OPERATION_DROP_NAMESPACE,
+              OPERATION_DROP_NAMESPACE_VERSION), m_name(name) {
   m_flags = (if_exists) ? NamespaceFlag::IF_EXISTS : 0;
   initialize_dependencies();
 }
 
 OperationDropNamespace::OperationDropNamespace(ContextPtr &context,
-                                               const MetaLog::EntityHeader &header_)
+                                          const MetaLog::EntityHeader &header_)
   : Operation(context, header_) {
 }
 
-OperationDropNamespace::OperationDropNamespace(ContextPtr &context, EventPtr &event) 
-  : Operation(context, event, MetaLog::EntityType::OPERATION_DROP_NAMESPACE), m_flags(0) {
+OperationDropNamespace::OperationDropNamespace(ContextPtr &context,
+                                               EventPtr &event) 
+  : Operation(context, event, MetaLog::EntityType::OPERATION_DROP_NAMESPACE,
+              OPERATION_DROP_NAMESPACE_VERSION), m_flags(0) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

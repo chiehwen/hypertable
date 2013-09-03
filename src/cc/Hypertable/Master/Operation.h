@@ -49,7 +49,7 @@ namespace Hypertable {
    *  @{
    */
 
-  /** %Operation states */
+  /** %Master operation states. */
   namespace OperationState {
 
     /** Enumeration for operation states */
@@ -138,8 +138,9 @@ namespace Hypertable {
      * #m_hash_code to the <i>id</i> field of MetaLog::Entity#header.
      * @param context %Master context
      * @param type %Operation type
+     * @param version %Operation version
      */
-    Operation(ContextPtr &context, int32_t type);
+    Operation(ContextPtr &context, int32_t type, uint16_t version);
 
     /** Constructor with request Event and operation type specifier.
      * Constructs an operation from a client request read off the wire.  Derived
@@ -151,8 +152,9 @@ namespace Hypertable {
      * @param context %Master context
      * @param event Event object
      * @param type %Operation type
+     * @param version %Operation version
      */
-    Operation(ContextPtr &context, EventPtr &event, int32_t type);
+    Operation(ContextPtr &context, EventPtr &event, int32_t type, uint16_t version);
 
     /** Constructor with MetaLog::EntityHeader.
      * Constructs an operation from <code>header_</code> read from a MetaLog.
@@ -344,10 +346,13 @@ namespace Hypertable {
      * Upon successful decode, this method will modify <code>*bufp</code>
      * to point to the first byte past the encoded result and will decrement
      * <code>*remainp</code> by the length of the encoded result.
-     * @param bufp Address of pointer to encoded operation
-     * @param remainp Address of integer holding amount of remaining buffer
+     * @param bufp Address of source buffer pointer (advanced by call)
+     * @param remainp Amount of remaining buffer pointed to by
+     * <code>*bufp</code> (decremented by call).
+     * @param definition_version Version of DefinitionMaster
      */
-    virtual void decode(const uint8_t **bufp, size_t *remainp);
+    virtual void decode(const uint8_t **bufp, size_t *remainp,
+                        uint16_t definition_version);
 
     /** Write human readable string represenation of operation to output stream.
      * @param os Output stream to which string is written
@@ -460,9 +465,10 @@ namespace Hypertable {
     int32_t m_error;
     int32_t m_remove_approvals;
     int32_t m_original_type;
+    String m_error_msg;
+    uint16_t m_version;
     bool m_unblock_on_exit;
     bool m_blocked;
-    String m_error_msg;
 
     // Expiration time (used by ResponseManager)
     HiResTime m_expiration_time;

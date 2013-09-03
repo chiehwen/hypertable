@@ -171,7 +171,7 @@ void Reader::load_file(const String &fname) {
         continue;
       }
 
-      EntityPtr entity = m_definition->create(m_version, header);
+      EntityPtr entity = m_definition->create(header);
 
       buf.clear();
       buf.ensure(header.length);
@@ -186,7 +186,7 @@ void Reader::load_file(const String &fname) {
       if (entity) {
         remaining = header.length;
         ptr = buf.base;
-        entity->decode(&ptr, &remaining);
+        entity->decode(&ptr, &remaining, m_version);
 
         // verify checksum
         int32_t computed_checksum = fletcher32(buf.base, header.length);
@@ -236,8 +236,8 @@ void Reader::read_header(int fd) {
 
   m_version = header.version;
 
-  if (!m_definition->supported_version(m_version))
+  if (!m_definition->version() < m_version)
     HT_THROWF(Error::METALOG_VERSION_MISMATCH,
-              "Unsuported %s version (definition: %d, header: %d)",
-              m_definition->name(), m_definition->version(), m_version);
+              "Unsuported %s version %d (definition version is %d)",
+              m_definition->name(), m_version, m_definition->version());
 }

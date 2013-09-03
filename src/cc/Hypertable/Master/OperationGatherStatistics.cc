@@ -40,10 +40,13 @@ extern "C" {
 #include "RangeServerStatistics.h"
 #include "LoadBalancer.h"
 
+#define OPERATION_GATHER_STATISTICS_VERSION 1
+
 using namespace Hypertable;
 
 OperationGatherStatistics::OperationGatherStatistics(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_GATHER_STATISTICS) {
+  : Operation(context, MetaLog::EntityType::OPERATION_GATHER_STATISTICS,
+              OPERATION_GATHER_STATISTICS_VERSION) {
   m_dependencies.insert(Dependency::INIT);
   m_dependencies.insert(Dependency::METADATA);
   m_dependencies.insert(Dependency::SYSTEM);

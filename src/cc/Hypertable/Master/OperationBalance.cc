@@ -43,17 +43,21 @@
 
 #include <sstream>
 
+#define OPERATION_BALANCE_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
 OperationBalance::OperationBalance(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_BALANCE) {
+  : Operation(context, MetaLog::EntityType::OPERATION_BALANCE,
+              OPERATION_BALANCE_VERSION) {
   initialize_dependencies();
   m_plan = new BalancePlan();
 }
 
 OperationBalance::OperationBalance(ContextPtr &context, BalancePlanPtr &plan)
-  : Operation(context, MetaLog::EntityType::OPERATION_BALANCE), m_plan(plan) {
+  : Operation(context, MetaLog::EntityType::OPERATION_BALANCE,
+              OPERATION_BALANCE_VERSION), m_plan(plan) {
   initialize_dependencies();
 }
 
@@ -64,7 +68,8 @@ OperationBalance::OperationBalance(ContextPtr &context,
 }
 
 OperationBalance::OperationBalance(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_BALANCE) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_BALANCE,
+              OPERATION_BALANCE_VERSION) {
   initialize_dependencies();
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;

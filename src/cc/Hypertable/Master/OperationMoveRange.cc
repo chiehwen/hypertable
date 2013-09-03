@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -36,13 +36,16 @@
 #include "Utility.h"
 #include "BalancePlanAuthority.h"
 
+#define OPERATION_MOVE_RANGE_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
 OperationMoveRange::OperationMoveRange(ContextPtr &context, const String &source,
         const TableIdentifier &table, const RangeSpec &range,
         const String &transfer_log, uint64_t soft_limit, bool is_split)
-  : Operation(context, MetaLog::EntityType::OPERATION_MOVE_RANGE),
+  : Operation(context, MetaLog::EntityType::OPERATION_MOVE_RANGE,
+              OPERATION_MOVE_RANGE_VERSION),
     m_table(table), m_range(range), m_transfer_log(transfer_log),
     m_soft_limit(soft_limit), m_is_split(is_split), m_source(source) {
   m_range_name = format("%s[%s..%s]", m_table.id, m_range.start_row,
@@ -58,7 +61,8 @@ OperationMoveRange::OperationMoveRange(ContextPtr &context,
 }
 
 OperationMoveRange::OperationMoveRange(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_MOVE_RANGE) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_MOVE_RANGE,
+              OPERATION_MOVE_RANGE_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -27,10 +27,13 @@
 
 #include "OperationStatus.h"
 
+#define OPERATION_STATUS_VERSION 1
+
 using namespace Hypertable;
 
 OperationStatus::OperationStatus(ContextPtr &context, EventPtr &event) 
-  : Operation(context, event, MetaLog::EntityType::OPERATION_STATUS) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_STATUS,
+              OPERATION_STATUS_VERSION) {
   HT_INFOF("Status-%lld", (Lld)header.id);
   set_state(OperationState::STARTED);
 }

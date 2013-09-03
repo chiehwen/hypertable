@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2012 Hypertable, Inc.
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -54,19 +54,21 @@ namespace Hypertable {
   }
 }
 
-Operation::Operation(ContextPtr &context, int32_t type)
+Operation::Operation(ContextPtr &context, int32_t type, uint16_t version)
   : MetaLog::Entity(type), m_context(context), m_state(OperationState::INITIAL),
-    m_error(0), m_remove_approvals(0), m_original_type(0), m_unblock_on_exit(false),
-    m_blocked(false) {
+    m_error(0), m_remove_approvals(0), m_original_type(0), m_version(version),
+    m_unblock_on_exit(false), m_blocked(false) {
   int32_t timeout = m_context->props->get_i32("Hypertable.Request.Timeout");
   m_expiration_time.sec = time(0) + timeout/1000;
   m_expiration_time.nsec = (timeout%1000) * 1000000LL;
   m_hash_code = (int64_t)header.id;
 }
 
-Operation::Operation(ContextPtr &context, EventPtr &event, int32_t type)
-  : MetaLog::Entity(type), m_context(context), m_event(event), m_state(OperationState::INITIAL),
-    m_error(0), m_remove_approvals(0), m_original_type(0), m_unblock_on_exit(false),
+Operation::Operation(ContextPtr &context, EventPtr &event, int32_t type,
+                     uint16_t version)
+  : MetaLog::Entity(type), m_context(context), m_event(event),
+    m_state(OperationState::INITIAL), m_error(0), m_remove_approvals(0),
+    m_original_type(0), m_version(version), m_unblock_on_exit(false),
     m_blocked(false) {
   m_expiration_time.sec = time(0) + m_event->header.timeout_ms/1000;
   m_expiration_time.nsec = (m_event->header.timeout_ms%1000) * 1000000LL;
@@ -75,8 +77,8 @@ Operation::Operation(ContextPtr &context, EventPtr &event, int32_t type)
 
 Operation::Operation(ContextPtr &context, const MetaLog::EntityHeader &header_)
   : MetaLog::Entity(header_), m_context(context), m_state(OperationState::INITIAL),
-    m_error(0), m_remove_approvals(0), m_original_type(0), m_unblock_on_exit(false),
-    m_blocked(false) {
+    m_error(0), m_remove_approvals(0), m_original_type(0), m_version(0),
+    m_unblock_on_exit(false), m_blocked(false) {
   m_hash_code = (int64_t)header.id;
 }
 
@@ -129,7 +131,7 @@ void Operation::display(std::ostream &os) {
 }
 
 size_t Operation::encoded_length() const {
-  size_t length = 20;
+  size_t length = 22;
 
   if (m_state == OperationState::COMPLETE) {
     length += 8 + encoded_result_length();
@@ -151,6 +153,7 @@ size_t Operation::encoded_length() const {
 
 void Operation::encode(uint8_t **bufp) const {
 
+  Serialization::encode_i16(bufp, m_version);
   Serialization::encode_i32(bufp, m_state);
   Serialization::encode_i64(bufp, m_expiration_time.sec);
   Serialization::encode_i32(bufp, m_expiration_time.nsec);
@@ -173,10 +176,15 @@ void Operation::encode(uint8_t **bufp) const {
   }
 }
 
-void Operation::decode(const uint8_t **bufp, size_t *remainp) {
+void Operation::decode(const uint8_t **bufp, size_t *remainp,
+                       uint16_t definition_version) {
   String str;
   size_t length;
 
+  if (definition_version >= 2)
+    m_version = Serialization::decode_i16(bufp, remainp);
+  else
+    m_version = 0;
   m_state = Serialization::decode_i32(bufp, remainp);
   m_expiration_time.sec = Serialization::decode_i64(bufp, remainp);
   m_expiration_time.nsec = Serialization::decode_i32(bufp, remainp);

@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/* -*- c++ -*-
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -28,11 +28,14 @@
 #include "OperationSystemUpgrade.h"
 #include "Utility.h"
 
+#define OPERATION_SYSTEM_UPGRADE_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
 OperationSystemUpgrade::OperationSystemUpgrade(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_SYSTEM_UPGRADE) {
+  : Operation(context, MetaLog::EntityType::OPERATION_SYSTEM_UPGRADE,
+              OPERATION_SYSTEM_UPGRADE_VERSION) {
 }
 
 OperationSystemUpgrade::OperationSystemUpgrade(ContextPtr &context,

@@ -21,8 +21,8 @@
 
 /** @file
  * Declarations for MetaLog::Reader.
- * This file contains declarations for MetaLog::Reader, a class for loading
- * (reading) a meta log.
+ * This file contains declarations for MetaLog::Reader, a class for reading
+ * a %MetaLog.
  */
 
 #ifndef HYPERTABLE_METALOGREADER_H
@@ -44,7 +44,7 @@ namespace Hypertable {
    * @{
    */
 
-  /** Loads a meta log.  This class is part of a group of generic meta log
+  /** Reads a %MetaLog.  This class is part of a group of generic meta log
    * manipulation classes.  A meta log is a server state log and is currently
    * used by both the RangeServer and the Master servers.  The set of valid
    * MetaLog::Entity classes are defined by a MetaLog::Definition object that

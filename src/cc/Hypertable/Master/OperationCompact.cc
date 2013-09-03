@@ -41,6 +41,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#define OPERATION_COMPACT_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
@@ -50,7 +52,8 @@ OperationCompact::OperationCompact(ContextPtr &context,
 }
 
 OperationCompact::OperationCompact(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_COMPACT) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_COMPACT,
+              OPERATION_COMPACT_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

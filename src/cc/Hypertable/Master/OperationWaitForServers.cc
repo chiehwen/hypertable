@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/* -*- c++ -*-
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -24,10 +24,13 @@
 
 #include "OperationWaitForServers.h"
 
+#define OPERATION_WAIT_FOR_SERVERS_VERSION 1
+
 using namespace Hypertable;
 
 OperationWaitForServers::OperationWaitForServers(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_WAIT_FOR_SERVERS) {
+  : Operation(context, MetaLog::EntityType::OPERATION_WAIT_FOR_SERVERS,
+              OPERATION_WAIT_FOR_SERVERS_VERSION) {
   m_obstructions.insert(Dependency::SERVERS);
 }
 

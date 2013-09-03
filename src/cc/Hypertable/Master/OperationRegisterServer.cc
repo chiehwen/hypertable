@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -39,12 +39,14 @@
 #include "OperationRegisterServer.h"
 #include "OperationProcessor.h"
 
+#define OPERATION_REGISTER_SERVER_VERSION 1
+
 using namespace Hypertable;
 
-
-OperationRegisterServer::OperationRegisterServer(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_REGISTER_SERVER) {
-
+OperationRegisterServer::OperationRegisterServer(ContextPtr &context,
+                                                 EventPtr &event)
+  : Operation(context, event, MetaLog::EntityType::OPERATION_REGISTER_SERVER,
+              OPERATION_REGISTER_SERVER_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

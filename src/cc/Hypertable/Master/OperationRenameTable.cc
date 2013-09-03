@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -29,11 +29,16 @@
 #include "OperationRenameTable.h"
 #include "Utility.h"
 
+#define OPERATION_RENAME_TABLE_VERSION 1
+
 using namespace Hypertable;
 
-
-OperationRenameTable::OperationRenameTable(ContextPtr &context, const String &old_name, const String &new_name)
-  : Operation(context, MetaLog::EntityType::OPERATION_RENAME_TABLE), m_old_name(old_name), m_new_name(new_name) {
+OperationRenameTable::OperationRenameTable(ContextPtr &context,
+                                           const String &old_name,
+                                           const String &new_name)
+  : Operation(context, MetaLog::EntityType::OPERATION_RENAME_TABLE,
+              OPERATION_RENAME_TABLE_VERSION), m_old_name(old_name),
+    m_new_name(new_name) {
   initialize_dependencies();
 }
 
@@ -43,7 +48,8 @@ OperationRenameTable::OperationRenameTable(ContextPtr &context,
 }
 
 OperationRenameTable::OperationRenameTable(ContextPtr &context, EventPtr &event) 
-  : Operation(context, event, MetaLog::EntityType::OPERATION_RENAME_TABLE) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_RENAME_TABLE,
+              OPERATION_RENAME_TABLE_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

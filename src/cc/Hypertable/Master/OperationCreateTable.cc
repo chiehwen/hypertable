@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -35,11 +35,16 @@
 
 #include <boost/algorithm/string.hpp>
 
+#define OPERATION_CREATE_TABLE_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
-OperationCreateTable::OperationCreateTable(ContextPtr &context, const String &name, const String &schema)
-  : Operation(context, MetaLog::EntityType::OPERATION_CREATE_TABLE), m_name(name), m_schema(schema) {
+OperationCreateTable::OperationCreateTable(ContextPtr &context,
+                                           const String &name,
+                                           const String &schema)
+  : Operation(context, MetaLog::EntityType::OPERATION_CREATE_TABLE,
+              OPERATION_CREATE_TABLE_VERSION), m_name(name), m_schema(schema) {
   initialize_dependencies();
 }
 
@@ -51,7 +56,8 @@ OperationCreateTable::OperationCreateTable(ContextPtr &context,
 }
 
 OperationCreateTable::OperationCreateTable(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_CREATE_TABLE) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_CREATE_TABLE,
+              OPERATION_CREATE_TABLE_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

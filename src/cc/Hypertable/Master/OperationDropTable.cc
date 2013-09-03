@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -35,11 +35,16 @@
 
 #include <boost/algorithm/string.hpp>
 
+#define OPERATION_DROP_TABLE_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
-OperationDropTable::OperationDropTable(ContextPtr &context, const String &name, bool if_exists)
-  : Operation(context, MetaLog::EntityType::OPERATION_DROP_TABLE), m_name(name), m_if_exists(if_exists) {
+OperationDropTable::OperationDropTable(ContextPtr &context, const String &name,
+                                       bool if_exists)
+  : Operation(context, MetaLog::EntityType::OPERATION_DROP_TABLE,
+              OPERATION_DROP_TABLE_VERSION), m_name(name),
+    m_if_exists(if_exists) {
   initialize_dependencies();
 }
 
@@ -49,7 +54,8 @@ OperationDropTable::OperationDropTable(ContextPtr &context,
 }
 
 OperationDropTable::OperationDropTable(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_DROP_TABLE) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_DROP_TABLE,
+              OPERATION_DROP_TABLE_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

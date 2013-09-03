@@ -33,11 +33,14 @@
 #include "OperationInitialize.h"
 #include "Utility.h"
 
+#define OPERATION_INITIALIZE_VERSION 1
+
 using namespace Hypertable;
 using namespace Hyperspace;
 
 OperationInitialize::OperationInitialize(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_INITIALIZE) {
+  : Operation(context, MetaLog::EntityType::OPERATION_INITIALIZE,
+              OPERATION_INITIALIZE_VERSION) {
   m_obstructions.insert(Dependency::INIT);
 }
 

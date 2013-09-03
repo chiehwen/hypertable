@@ -28,11 +28,15 @@
 
 #include "OperationCreateNamespace.h"
 
+#define OPERATION_CREATE_NAMESPACE_VERSION 1
+
 using namespace Hypertable;
 
-
-OperationCreateNamespace::OperationCreateNamespace(ContextPtr &context, const String &name, int flags) 
-  : Operation(context, MetaLog::EntityType::OPERATION_CREATE_NAMESPACE), m_name(name), m_flags(flags) {
+OperationCreateNamespace::OperationCreateNamespace(ContextPtr &context,
+                                                   const String &name,
+                                                   int flags) 
+  : Operation(context, MetaLog::EntityType::OPERATION_CREATE_NAMESPACE,
+              OPERATION_CREATE_NAMESPACE_VERSION), m_name(name), m_flags(flags) {
   initialize_dependencies();
 }
 
@@ -42,7 +46,8 @@ OperationCreateNamespace::OperationCreateNamespace(ContextPtr &context,
 }
 
 OperationCreateNamespace::OperationCreateNamespace(ContextPtr &context, EventPtr &event) 
-  : Operation(context, event, MetaLog::EntityType::OPERATION_CREATE_NAMESPACE), m_flags(0) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_CREATE_NAMESPACE,
+              OPERATION_CREATE_NAMESPACE_VERSION), m_flags(0) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);

@@ -41,12 +41,13 @@
 
 #include <boost/algorithm/string.hpp>
 
-#define SET_VARIABLES_VERSION 1
+#define OPERATION_SET_STATE_VERSION 1
 
 using namespace Hypertable;
 
 OperationSetState::OperationSetState(ContextPtr &context)
-  : Operation(context, MetaLog::EntityType::OPERATION_SET) {
+  : Operation(context, MetaLog::EntityType::OPERATION_SET,
+              OPERATION_SET_STATE_VERSION) {
   initialize_dependencies();
 }
 
@@ -56,7 +57,8 @@ OperationSetState::OperationSetState(ContextPtr &context,
 }
 
 OperationSetState::OperationSetState(ContextPtr &context, EventPtr &event)
-  : Operation(context, event, MetaLog::EntityType::OPERATION_SET) {
+  : Operation(context, event, MetaLog::EntityType::OPERATION_SET,
+              OPERATION_SET_STATE_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);
@@ -149,11 +151,10 @@ void OperationSetState::display_state(std::ostream &os) {
 }
 
 size_t OperationSetState::encoded_state_length() const {
-  return 16 + (5 * m_specs.size());
+  return 12 + (5 * m_specs.size());
 }
 
 void OperationSetState::encode_state(uint8_t **bufp) const {
-  Serialization::encode_i32(bufp, SET_VARIABLES_VERSION);
   Serialization::encode_i64(bufp, m_generation);
   Serialization::encode_i32(bufp, m_specs.size());
   foreach_ht (const SystemVariable::Spec &spec, m_specs) {
@@ -165,8 +166,8 @@ void OperationSetState::encode_state(uint8_t **bufp) const {
 void OperationSetState::decode_state(const uint8_t **bufp, size_t *remainp) {
   SystemVariable::Spec spec;
   m_specs.clear();
-  // skip version
-  Serialization::decode_i32(bufp, remainp);
+  if (m_version == 0)
+    Serialization::decode_i32(bufp, remainp); // skip old version
   m_generation = Serialization::decode_i64(bufp, remainp);
   int32_t count = Serialization::decode_i32(bufp, remainp);
   for (int32_t i=0; i<count; i++) {

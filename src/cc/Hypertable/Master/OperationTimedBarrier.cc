@@ -25,12 +25,15 @@
 #include "OperationProcessor.h"
 #include "OperationTimedBarrier.h"
 
+#define OPERATION_TIMED_BARRIER_VERSION 1
+
 using namespace Hypertable;
 
 OperationTimedBarrier::OperationTimedBarrier(ContextPtr &context,
                                              const String &block_dependency,
                                              const String &wakeup_dependency)
-  : Operation(context, MetaLog::EntityType::OPERATION_TIMED_BARRIER),
+  : Operation(context, MetaLog::EntityType::OPERATION_TIMED_BARRIER,
+              OPERATION_TIMED_BARRIER_VERSION),
     m_block_dependency(block_dependency), m_wakeup_dependency(wakeup_dependency),
     m_shutdown(false) {
   m_obstructions.insert(block_dependency);

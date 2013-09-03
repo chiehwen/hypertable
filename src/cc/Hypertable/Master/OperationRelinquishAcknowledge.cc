@@ -1,5 +1,5 @@
-/** -*- c++ -*-
- * Copyright (C) 2007-2012 Hypertable, Inc.
+/*
+ * Copyright (C) 2007-2013 Hypertable, Inc.
  *
  * This file is part of Hypertable.
  *
@@ -34,17 +34,22 @@
 #include "ReferenceManager.h"
 #include "Utility.h"
 
+#define OPERATION_RELINQUISH_ACKNOWLEDGE_VERSION 1
+
 using namespace Hypertable;
 
 OperationRelinquishAcknowledge::OperationRelinquishAcknowledge(ContextPtr &ctx,
               const String &source, TableIdentifier *table, RangeSpec *range)
-  : Operation(ctx, MetaLog::EntityType::OPERATION_RELINQUISH_ACKNOWLEDGE),
+  : Operation(ctx, MetaLog::EntityType::OPERATION_RELINQUISH_ACKNOWLEDGE,
+              OPERATION_RELINQUISH_ACKNOWLEDGE_VERSION),
     m_source(source), m_table(*table), m_range(*range) {
 }
 
 
 OperationRelinquishAcknowledge::OperationRelinquishAcknowledge(ContextPtr &context, EventPtr &event) 
-  : Operation(context, event, MetaLog::EntityType::OPERATION_RELINQUISH_ACKNOWLEDGE) {
+  : Operation(context, event,
+              MetaLog::EntityType::OPERATION_RELINQUISH_ACKNOWLEDGE,
+              OPERATION_RELINQUISH_ACKNOWLEDGE_VERSION) {
   const uint8_t *ptr = event->payload;
   size_t remaining = event->payload_len;
   decode_request(&ptr, &remaining);
